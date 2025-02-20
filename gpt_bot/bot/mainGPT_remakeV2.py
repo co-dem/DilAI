@@ -22,6 +22,9 @@ storage = MemoryStorage()
 bot = Bot(TOKEN)
 dp = Dispatcher(bot, storage=storage)
 
+def restoredata():
+    restore_data(ud)
+
 class GptStates(StatesGroup):
     business_type = State()
     question = State()
@@ -50,8 +53,7 @@ async def pay_func(message: types.Message, apitoken):
 
 @dp.message_handler(commands=['give', 'take'])
 async def manipulatePrem_func(message: types.Message):
-    # if message.from_id != ADMINID: return
-    if message.from_id != 798330024: return
+    if message.from_id != ADMINID: return
 
     uid = message.text.split(' ') #* uid[0] = /give or /take | uid[1] - [users id] | uid[2] - [username]
 
@@ -74,8 +76,7 @@ async def manipulatePrem_func(message: types.Message):
 
 @dp.message_handler(commands='db')
 async def getDB(message: types.Message):
-    # if message.from_id != ADMINID: return
-    if message.from_id != 798330024: return
+    if message.from_id != ADMINID: return
 
     with open(DB_PATH, 'rb') as file:
         await bot.send_document(message.from_id, file)
@@ -351,5 +352,5 @@ async def answerTheQuestion_func(message: types.Message, state: FSMContext):
             await bot.send_message(message.from_id, invalid_question_msg[ud[message.from_id]['lang']])
             await GptStates.question.set()
 
-executor.start_polling(dp)
+executor.start_polling(dp, on_startup=restoredata())
 #| coded by c0dem
